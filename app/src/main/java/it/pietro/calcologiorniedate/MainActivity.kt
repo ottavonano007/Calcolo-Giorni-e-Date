@@ -4,7 +4,7 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.SelectionContainer
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -113,11 +112,11 @@ private fun DateCalculatorApp() {
 
                 when (calculation) {
                     Calculation.BETWEEN -> {
-                        DateInput("Data iniziale", firstDate, { firstDate = it }) { showDatePicker(firstDate, it) }
-                        DateInput("Data finale", secondDate, { secondDate = it }) { showDatePicker(secondDate, it) }
+                        DateInput("Data iniziale", firstDate, { selected -> firstDate = selected }) { showDatePicker(firstDate) { selected -> firstDate = selected } }
+                        DateInput("Data finale", secondDate, { selected -> secondDate = selected }) { showDatePicker(secondDate) { selected -> secondDate = selected } }
                     }
                     Calculation.ADD -> {
-                        DateInput("Data di partenza", firstDate, { firstDate = it }) { showDatePicker(firstDate, it) }
+                        DateInput("Data di partenza", firstDate, { selected -> firstDate = selected }) { showDatePicker(firstDate) { selected -> firstDate = selected } }
                         OutlinedTextField(
                             value = daysInput,
                             onValueChange = { daysInput = it.filter(Char::isDigit) },
@@ -128,7 +127,7 @@ private fun DateCalculatorApp() {
                         )
                     }
                     Calculation.PAST, Calculation.FUTURE -> {
-                        DateInput("Seleziona la data", secondDate, { secondDate = it }) { showDatePicker(secondDate, it) }
+                        DateInput("Seleziona la data", secondDate, { selected -> secondDate = selected }) { showDatePicker(secondDate) { selected -> secondDate = selected } }
                     }
                 }
 

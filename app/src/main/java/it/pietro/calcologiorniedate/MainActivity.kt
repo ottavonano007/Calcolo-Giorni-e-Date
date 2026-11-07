@@ -162,19 +162,19 @@ private fun DateCalculatorApp() {
                                 when (calculation) {
                                     Calculation.BETWEEN ->
                                         if (start == null || end == null) "Controlla le date inserite."
-                                        else kotlin.math.abs(ChronoUnit.DAYS.between(start, end)).toString() + " giorni"
+                                        else { val n = kotlin.math.abs(ChronoUnit.DAYS.between(start, end)); "$n giorni (${formatDaysAsWeeks(n)})" }
                                     Calculation.ADD -> {
                                         val amount = days.toLongOrNull()
                                         if (start == null || amount == null) "Controlla la data e il numero di giorni."
-                                        else "Data di scadenza: " + start.plusDays(amount).format(dateFormat)
+                                        else "Data di scadenza: " + start.plusDays(amount).format(dateFormat) + "\nGiorni aggiunti: " + amount + " (${formatDaysAsWeeks(amount)})"
                                     }
                                     Calculation.PAST -> if (end == null) "Controlla la data inserita." else {
                                         val n = ChronoUnit.DAYS.between(end, LocalDate.now())
-                                        if (n < 0) "La data indicata è nel futuro." else "Sono trascorsi " + n + " giorni"
+                                        if (n < 0) "La data indicata è nel futuro." else "Sono trascorsi " + n + " giorni (" + formatDaysAsWeeks(n) + ")"
                                     }
                                     Calculation.FUTURE -> if (end == null) "Controlla la data inserita." else {
                                         val n = ChronoUnit.DAYS.between(LocalDate.now(), end)
-                                        if (n < 0) "La data indicata è nel passato." else "Mancano " + n + " giorni"
+                                        if (n < 0) "La data indicata è nel passato." else "Mancano " + n + " giorni (" + formatDaysAsWeeks(n) + ")"
                                     }
                                 }
                             } catch (_: DateTimeException) {

@@ -20,7 +20,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import java.time.DateTimeException
 import java.time.LocalDate
@@ -327,9 +329,26 @@ private fun RecordCard(record: CalculationRecord, favorite: Boolean, onReuse: ()
 
 @Composable
 private fun DateInput(label: String, value: String, onValueChange: (String) -> Unit, onCalendarClick: () -> Unit) {
+    var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+
+    // Aggiorna il campo quando la data cambia dall'esterno (calendario o riutilizzo).
+    LaunchedEffect(value) {
+        if (fieldValue.text != value) {
+            fieldValue = TextFieldValue(value, TextRange(value.length))
+        }
+    }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
-            value = value, onValueChange = { onValueChange(formatDateInput(it)) },
+            value = fieldValue,
+            onValueChange = { typed ->
+                val formatted = formatDateInput(typed.text, typed.selection.start, typed.selection.end)
+                fieldValue = TextFieldValue(
+                    text = formatted.text,
+                    selection = TextRange(formatted.selectionStart, formatted.selectionEnd)
+                )
+                onValueChange(formatted.text)
+            },
             label = { Text(label) }, placeholder = { Text("GG/MM/AAAA") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true, modifier = Modifier.weight(1f)

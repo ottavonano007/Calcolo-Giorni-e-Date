@@ -329,12 +329,16 @@ private fun RecordCard(record: CalculationRecord, favorite: Boolean, onReuse: ()
 
 @Composable
 private fun DateInput(label: String, value: String, onValueChange: (String) -> Unit, onCalendarClick: () -> Unit) {
-    var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    // Nel campo vengono conservate soltanto le cifre: le barre sono una
+    // trasformazione visiva e quindi Backspace può cancellare sempre tutto.
+    val initialDigits = remember(value) { value.filter(Char::isDigit).take(8) }
+    var fieldValue by remember { mutableStateOf(TextFieldValue(initialDigits, TextRange(initialDigits.length))) }
 
     // Aggiorna il campo quando la data cambia dall'esterno (calendario o riutilizzo).
     LaunchedEffect(value) {
-        if (fieldValue.text != value) {
-            fieldValue = TextFieldValue(value, TextRange(value.length))
+        val digits = value.filter(Char::isDigit).take(8)
+        if (fieldValue.text != digits) {
+            fieldValue = TextFieldValue(digits, TextRange(digits.length))
         }
     }
 
@@ -342,15 +346,19 @@ private fun DateInput(label: String, value: String, onValueChange: (String) -> U
         OutlinedTextField(
             value = fieldValue,
             onValueChange = { typed ->
-                val formatted = formatDateInput(typed.text, typed.selection.start, typed.selection.end)
+                val digits = typed.text.filter(Char::isDigit).take(8)
+                fun mapOffset(offset: Int): Int =
+                    typed.text.take(offset.coerceIn(0, typed.text.length)).count(Char::isDigit)
+                        .coerceAtMost(digits.length)
                 fieldValue = TextFieldValue(
-                    text = formatted.text,
-                    selection = TextRange(formatted.selectionStart, formatted.selectionEnd)
+                    text = digits,
+                    selection = TextRange(mapOffset(typed.selection.start), mapOffset(typed.selection.end))
                 )
-                onValueChange(formatted.text)
+                onValueChange(formatDateInput(digits))
             },
             label = { Text(label) }, placeholder = { Text("GG/MM/AAAA") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            visualTransformation = DateVisualTransformation(),
             singleLine = true, modifier = Modifier.weight(1f)
         )
         TextButton(onClick = onCalendarClick, modifier = Modifier.padding(top = 8.dp)) { Text("Calendario") }

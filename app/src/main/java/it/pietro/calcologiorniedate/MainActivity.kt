@@ -329,7 +329,7 @@ private fun RecordCard(record: CalculationRecord, favorite: Boolean, onReuse: ()
 private fun DateInput(label: String, value: String, onValueChange: (String) -> Unit, onCalendarClick: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
-            value = value, onValueChange = onValueChange,
+            value = value, onValueChange = { onValueChange(formatDateInput(it)) },
             label = { Text(label) }, placeholder = { Text("GG/MM/AAAA") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true, modifier = Modifier.weight(1f)
